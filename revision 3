@@ -1,0 +1,40 @@
+sem_init( &sem_students, 0, 0 );
+	sem_init( &sem_ta, 0, 1 );
+
+	//Create threads.
+	pthread_mutex_init( &mutex_thread, NULL );
+	pthread_create( &ta, NULL, ta_actions, NULL );
+	for( i = 0; i < student_num; i++ )
+	{
+		student_ids[i] = i + 1;
+		pthread_create( &students[i], NULL, student_actions, (void*) &student_ids[i] );
+	}
+
+	//Join threads
+	pthread_join(ta, NULL);
+	for( i =0; i < student_num; i++ )
+	{
+		pthread_join( students[i],NULL );
+	}
+
+	return 0;
+}
+
+void* ta_actions() {
+
+	printf( "Checking for students.\n" );
+
+	while( 1 ) {
+
+		//if students are waiting
+		if ( number_students_waiting > 0 ) {
+
+			ta_sleeping_flag = 0;
+			sem_wait( &sem_students );
+			pthread_mutex_lock( &mutex_thread );
+
+			int help_time = rand() % 5;
+
+			//TA helping student.
+			printf( "Helping a student for %d seconds. Students waiting = %d.\n", help_time, (number_students_waiting - 1) );
+			printf( "Student %d receiving help.\n",waiting_room_chairs[next_teaching_position] );
