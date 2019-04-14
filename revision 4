@@ -1,0 +1,46 @@
+	waiting_room_chairs[next_teaching_position]=0;
+			number_students_waiting--;
+			next_teaching_position = ( next_teaching_position + 1 ) % NUM_WAITING_CHAIRS;
+
+			sleep( help_time );
+
+			pthread_mutex_unlock( &mutex_thread );
+			sem_post( &sem_ta );
+
+		}
+		//if no students are waiting
+		else {
+
+			if ( ta_sleeping_flag == 0 ) {
+
+				printf( "No students waiting. Sleeping.\n" );
+				ta_sleeping_flag = 1;
+
+			}
+
+		}
+
+	}
+
+}
+
+void* student_actions( void* student_id ) {
+
+	int id_student = *(int*)student_id;
+
+	while( 1 ) {
+
+		//if student is waiting, continue waiting
+		if ( isWaiting( id_student ) == 1 ) { continue; }
+
+		//student is programming.
+		int time = rand() % 5;
+		printf( "\tStudent %d is programming for %d seconds.\n", id_student, time );
+		sleep( time );
+
+		pthread_mutex_lock( &mutex_thread );
+
+		if( number_students_waiting < NUM_WAITING_CHAIRS ) {
+
+			waiting_room_chairs[next_seating_position] = id_student;
+			number_students_waiting++;
