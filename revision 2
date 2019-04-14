@@ -1,0 +1,21 @@
+int main( int argc, char **argv ){
+
+	int i;
+	int student_num;
+
+	if (argc > 1 ) {
+		if ( isNumber( argv[1] ) == 1) {
+			student_num = atoi( argv[1] );
+		}
+		else {
+			printf("Invalid input. Quitting program.");
+			return 0;
+		}
+	}
+	else {
+		student_num = DEFAULT_NUM_STUDENTS;
+	}
+
+	int student_ids[student_num];
+	pthread_t students[student_num];
+	pthread_t ta;
